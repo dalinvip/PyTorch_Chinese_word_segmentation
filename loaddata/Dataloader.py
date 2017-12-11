@@ -60,6 +60,8 @@ class load_data():
             lines = f.readlines()
             for index, line in enumerate(lines):
                 # copy with "/n"
+                if line is None:
+                    continue
                 line = unicodedata.normalize('NFKC', line.strip())
                 # init instance
                 inst = instance()
@@ -69,7 +71,6 @@ class load_data():
                     # segment the word and pos in line
                     # segment with tab space
                     # word, _, _ = word_pos.partition("   ")
-
                     word_length = len(word)
                     inst.words.append(word)
                     inst.gold_seg.append("[" + str(count) + "," + str(count + word_length) + "]")

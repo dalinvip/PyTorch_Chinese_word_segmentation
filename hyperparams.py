@@ -14,9 +14,9 @@ class Hyperparams():
         self.dev_path = "./data_test/devCorpus_16.seg.txt"
         self.test_path = "./data_test/TestCorpus_gold_16.seg.txt"
 
-        # self.train_path = "./data/TrainingCorpus_16.seg.txt"
-        # self.dev_path = "./data/devCorpus_16.seg.txt"
-        # self.test_path = "./data/TestCorpus_gold_16.seg.txt"
+        # self.train_path = "./data/TrainingCorpus.seg.txt"
+        # self.dev_path = "./data/devCorpus.seg.txt"
+        # self.test_path = "./data/TestCorpus_gold.seg.txt"
 
         self.learning_rate = 0.001
         # self.learning_rate_decay = 0.9   # value is 1 means not change lr

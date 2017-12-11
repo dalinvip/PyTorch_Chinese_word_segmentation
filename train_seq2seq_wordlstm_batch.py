@@ -5,11 +5,9 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.nn.utils as utils
 import torch.optim.lr_scheduler as lr_scheduler
-import shutil
 import random
 import hyperparams as hy
 from eval import Eval
-from loaddata.common import sep, app, paddingkey, unkkey, nullkey
 import time
 torch.manual_seed(hy.seed_num)
 random.seed(hy.seed_num)
@@ -115,14 +113,14 @@ def train(train_iter, dev_iter, test_iter, model_encoder, model_decoder, args):
             print("\n{} epoch dev F-score".format(epoch))
             dev_eval_pos.clear()
             dev_eval_seg.clear()
-            eval(dev_iter, model_encoder, model_decoder, args, dev_eval_seg, dev_eval_pos)
+            eval(dev_iter, model_encoder, model_decoder, dev_eval_seg)
             # model_encoder.train()
             # model_decoder.train()
         if steps is not 0:
             print("{} epoch test F-score".format(epoch))
             test_eval_pos.clear()
             test_eval_seg.clear()
-            eval(test_iter, model_encoder, model_decoder, args, test_eval_seg, test_eval_pos)
+            eval(test_iter, model_encoder, model_decoder, test_eval_seg)
             print("\n")
 
 
@@ -138,45 +136,14 @@ def cal_train_acc(batch_features, train_eval, batch_count, decoder_out, maxCharS
         train_eval.gold_num += inst.chars_size
 
 
-def jointPRF(inst, state, seg_eval, pos_eval):
-    words = state.words
-    posLabels = state.pos_labels
-    count = 0
-    predict_seg = []
-    predict_pos = []
-
-    for idx in range(len(words)):
-        w = words[idx]
-        posLabel = posLabels[idx]
-        predict_seg.append('[' + str(count) + ',' + str(count + len(w)) + ']')
-        predict_pos.append('[' + str(count) + ',' + str(count + len(w)) + ']' + posLabel)
-        count += len(w)
-
-    seg_eval.gold_num += len(inst.gold_seg)
-    seg_eval.predict_num += len(predict_seg)
-    for p in predict_seg:
-        if p in inst.gold_seg:
-            seg_eval.correct_num += 1
-
-    pos_eval.gold_num += len(inst.gold_pos)
-    pos_eval.predict_num += len(predict_pos)
-    for p in predict_pos:
-        if p in inst.gold_pos:
-            pos_eval.correct_num += 1
-
-
-def jointPRF_Batch(inst, state_words, state_posLabel, seg_eval, pos_eval):
+def jointPRF_Batch(inst, state_words, seg_eval):
     words = state_words
-    posLabels = state_posLabel
     count = 0
     predict_seg = []
-    predict_pos = []
 
     for idx in range(len(words)):
         w = words[idx]
-        posLabel = posLabels[idx]
         predict_seg.append('[' + str(count) + ',' + str(count + len(w)) + ']')
-        predict_pos.append('[' + str(count) + ',' + str(count + len(w)) + ']' + posLabel)
         count += len(w)
 
     seg_eval.gold_num += len(inst.gold_seg)
@@ -184,12 +151,6 @@ def jointPRF_Batch(inst, state_words, state_posLabel, seg_eval, pos_eval):
     for p in predict_seg:
         if p in inst.gold_seg:
             seg_eval.correct_num += 1
-
-    pos_eval.gold_num += len(inst.gold_pos)
-    pos_eval.predict_num += len(predict_pos)
-    for p in predict_pos:
-        if p in inst.gold_pos:
-            pos_eval.correct_num += 1
 
 
 def getMaxindex(decode_out_acc, args):
@@ -203,32 +164,22 @@ def getMaxindex(decode_out_acc, args):
     return maxIndex
 
 
-def eval(data_iter, model_encoder, model_decoder, args, eval_seg, eval_pos):
+def eval(data_iter, model_encoder, model_decoder, eval_seg):
     # eval time
     eval_start = time.time()
-    # eval_seg = Eval()
-    # eval_pos = Eval()
-    time_list = []
     for batch_features in data_iter:
-        start = time.time()
         encoder_out = model_encoder(batch_features)
         decoder_out, state = model_decoder(batch_features, encoder_out, train=False)
-        time_list.append(time.time() - start)
         for i in range(batch_features.batch_length):
-            jointPRF_Batch(batch_features.inst[i], state.words[i], state.pos_labels[i], eval_seg, eval_pos)
-            # jointPRF(batch_features.inst[i], state[i], eval_seg, eval_pos)
+            jointPRF_Batch(batch_features.inst[i], state.words[i], eval_seg)
+
     # calculate the time
-    print("eval decoder time cost: ", sum(time_list), 's')
     print("eval time cost: ", time.time() - eval_start, 's')
 
     # calculate the F-Score
     p, r, f = eval_seg.getFscore()
-    print("seg: precision = {}%  recall = {}% , f-score = {}%".format(p, r, f))
-    p, r, f = eval_pos.getFscore()
-    print("pos: precision = {}%  recall = {}% , f-score = {}%\n".format(p, r, f))
+    print("seg: precision = {}%  recall = {}% , f-score = {}%\n".format(p, r, f))
 
-    # model_encoder.train()
-    # model_decoder.train()
 
 
 

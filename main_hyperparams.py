@@ -108,7 +108,7 @@ def dalaloader(args):
     data_loader = load_data()
     train_data, dev_data, test_data = data_loader.load_data(path=[args.train_path, args.dev_path, args.test_path],
                                                             shuffle=args.shuffle)
-    print(train_data)
+    # print(train_data)
     # create the alphabet
     create_alphabet = Create_Alphabet(min_freq=args.min_freq, word_min_freq=args.word_min_freq,
                                       char_min_freq=args.char_min_freq, bichar_min_freq=args.bichar_min_freq)
