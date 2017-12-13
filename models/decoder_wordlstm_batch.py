@@ -67,7 +67,7 @@ class Decoder_WordLstm(nn.Module):
 
         self.dropout = nn.Dropout(self.args.dropout)
 
-        self.softmax = nn.LogSoftmax()
+        self.softmax = nn.LogSoftmax(dim=1)
 
         self.bucket = Variable(torch.zeros(1, self.args.label_size))
         self.bucket_rnn = Variable(torch.zeros(1, self.args.rnn_hidden_dim))

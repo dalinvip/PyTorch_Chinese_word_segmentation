@@ -1,5 +1,5 @@
 ## Introduction
-	Chinese Word Segmentation with seq2seq model implement in pytorch
+	pytorch implement  Chinese Word Segmentation and POS Tagging using seq2seq model
 
 ## Requirement
 	* python 3
@@ -10,8 +10,7 @@
 	update later
 
 ## Data
-	update later
-	
+	CTB6.0
 
 ## How to run
 	"python main-hyperparams.py"  or  "bash run.sh"
@@ -27,6 +26,8 @@
 
 - the file of **`train_seq2seq_wordlstm_batch.py`** is the train function about batch decoder(fast speed)
 
+- the file of **`train_seq2seq_wordlstm_nobatch.py`** is the train function about no use batch(low speed)
+
 - the file of **`eval.py`** is the eval function about calculate F-score
 
 - the folder of **`loaddata`** contains some file of load dataset
@@ -41,7 +42,7 @@
 
 - the folder of **`word_embedding`** is the file of word embedding that have pretrained you want to use
 
-- the folder of **`data_test`** contains the dataset file for test
+- the folder of **`pos_test_data`** contains the dataset file, dataset is `CTB6.0`
 
 - the file of **`Parameters.txt`** is being used to save all parameters values.
 
